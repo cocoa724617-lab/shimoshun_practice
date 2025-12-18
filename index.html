@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Style Diagnosis</title>
+  <title>Style Diagnosis（9タイプ）</title>
   <style>
     :root { --bg:#fafafa; --card:#fff; --text:#111; --muted:#666; --line:#ddd; }
     body { font-family: system-ui, -apple-system, Segoe UI, sans-serif; margin:0; padding:24px; background:var(--bg); color:var(--text); }
-    .card { max-width: 760px; margin: 0 auto; background:var(--card); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+    .card { max-width: 820px; margin: 0 auto; background:var(--card); border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
     .row { display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
     .muted { color:var(--muted); font-size: 14px; }
     .bar { height: 10px; background:#eee; border-radius: 999px; overflow:hidden; margin: 10px 0 6px; width:100%; }
@@ -24,11 +24,12 @@
     .pill { display:inline-block; padding:4px 10px; border-radius:999px; background:#f2f2f2; margin-right:6px; }
     .result { display:none; }
     .quiz { display:none; }
-    .start { display:block; }
+    .start { display:block; margin-top:14px; }
     .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap:12px; width:100%; }
     .box { border:1px solid var(--line); border-radius:12px; padding:12px; background:#fff; }
     .small { font-size:12px; color:var(--muted); }
     .scoreline { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size:12px; color:var(--muted); }
+    .tag { display:inline-block; padding:3px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted); margin-right:6px; }
     @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -36,32 +37,25 @@
   <div class="card">
     <div class="row">
       <div>
-        <h2 id="title" style="margin:0;">Style Diagnosis</h2>
-        <div class="muted" id="subtitle">約2分で終わります</div>
+        <h2 id="title" style="margin:0;">Style Diagnosis（9タイプ）</h2>
+        <div class="muted" id="subtitle">メインタイプ＋サブタイプを表示します</div>
       </div>
       <div class="muted" id="step"></div>
     </div>
 
-    <!-- START SCREEN -->
-    <div id="start" class="start" style="margin-top:14px;">
+    <div id="start" class="start">
       <div class="grid2">
         <div class="box">
-          <div style="font-weight:700; margin-bottom:6px;">診断タイプ数</div>
-          <label style="display:block; margin:6px 0;">
-            <input type="radio" name="mode" value="9" checked>
-            9タイプ（クリーン/カジュアル/ストリート/スポーティ/モード/アメカジ/アウトドア/韓国系/古着）
-          </label>
-          <label style="display:block; margin:6px 0;">
-            <input type="radio" name="mode" value="8">
-            8タイプ（アメカジ＋古着 を統合）
-          </label>
-          <div class="small">※URLに <b>?mode=8</b> を付けると、開いた瞬間から8タイプ固定にもできます。</div>
+          <div style="font-weight:700; margin-bottom:6px;">診断のポイント</div>
+          <div class="muted">質問ごとに選択肢数が違ってOK。あなたの好みを細かく拾います。</div>
+          <div class="muted" style="margin-top:8px;">結果は <b>メイン（1位）</b>＋<b>サブ（2位）</b> を必ず表示します。</div>
+          <div class="small" style="margin-top:8px;">※サブは「次に強い傾向」。混在スタイルも表現できます。</div>
         </div>
-
         <div class="box">
-          <div style="font-weight:700; margin-bottom:6px;">使い方</div>
-          <div class="muted">12問・各4択。直感で選んでOK。</div>
-          <div class="muted">結果は「メインタイプ」＋差が小さければ「ミックス傾向」も表示します。</div>
+          <div style="font-weight:700; margin-bottom:6px;">9タイプ</div>
+          <div class="small">
+            きれいめ / カジュアル / ストリート / スポーティ / モード / アメカジ / アウトドア / 韓国系 / 古着
+          </div>
           <div style="margin-top:12px;">
             <button id="startBtn" class="primary">診断をはじめる</button>
           </div>
@@ -69,27 +63,33 @@
       </div>
     </div>
 
-    <!-- QUIZ -->
     <div class="bar"><div id="progress"></div></div>
 
     <div id="quiz" class="quiz">
       <div class="q" id="qText"></div>
       <div class="choices" id="choices"></div>
-
       <div class="btns">
         <button id="backBtn">戻る</button>
         <button id="nextBtn" class="primary" disabled>次へ</button>
       </div>
     </div>
 
-    <!-- RESULT -->
     <div id="result" class="result">
       <h3 style="margin-top:0;">診断結果</h3>
-      <div id="resultMain" style="font-size:20px; margin: 8px 0;"></div>
-      <div id="resultMix" class="muted" style="margin-bottom: 12px;"></div>
-      <div class="muted" id="resultExplain" style="margin-bottom: 10px;"></div>
 
-      <div class="muted" style="margin-top:6px;">（研究用：スコア）</div>
+      <div id="resultMain" style="font-size:20px; margin: 8px 0;"></div>
+      <div id="resultSub" style="font-size:16px; margin: 4px 0 10px;"></div>
+
+      <div class="muted" id="resultExplain" style="margin-bottom: 12px;"></div>
+
+      <div style="margin: 10px 0 6px;">
+        <span class="tag">メインの強み</span><span id="mainTags" class="muted"></span>
+      </div>
+      <div style="margin: 6px 0 12px;">
+        <span class="tag">サブの足し算</span><span id="subTags" class="muted"></span>
+      </div>
+
+      <div class="muted">（研究用：スコア）</div>
       <div id="resultScores" class="scoreline"></div>
 
       <div style="margin-top:16px;">
@@ -98,157 +98,164 @@
     </div>
   </div>
 
-  <!-- ここが「JSON方式」：設定をHTML内に埋め込み -->
+  <!-- =====================
+       設定JSON（9タイプ）
+       ・質問ごとに選択肢数は自由
+       ・配点は「主タイプ +3〜4」「近いタイプ +1〜2」で再設計
+       ===================== -->
   <script id="quizConfig" type="application/json">
 {
-  "version": "1.0",
-  "title": "Style Diagnosis",
-  "timeEstimateSec": 120,
-  "mixThreshold": 2,
-  "useEightTypes": false,
-  "mergeRules": { "AME_VIN": ["AME", "VIN"] },
+  "version": "2.0",
+  "title": "Style Diagnosis（9タイプ）",
   "types": [
-    { "id": "CLN", "label": "きれいめ（クリーン）" },
-    { "id": "CAS", "label": "カジュアル" },
-    { "id": "STR", "label": "ストリート" },
-    { "id": "SPT", "label": "スポーティ（アスレジャー）" },
-    { "id": "MOD", "label": "モード" },
-    { "id": "AME", "label": "アメカジ" },
-    { "id": "OUT", "label": "アウトドア" },
-    { "id": "KOR", "label": "韓国系" },
-    { "id": "VIN", "label": "古着系（ヴィンテージ）" }
+    { "id": "CLN", "label": "きれいめ（クリーン）", "tags": ["清潔感", "整い", "シンプル配色", "シャツ/スラックス"] },
+    { "id": "CAS", "label": "カジュアル", "tags": ["自然体", "着回し", "デニム/スウェット", "定番スニーカー"] },
+    { "id": "STR", "label": "ストリート", "tags": ["オーバー", "ロゴ", "カーゴ", "主役感"] },
+    { "id": "SPT", "label": "スポーティ（アスレジャー）", "tags": ["快適", "軽い", "動きやすい", "ランニング系"] },
+    { "id": "MOD", "label": "モード", "tags": ["黒多め", "ミニマル", "シャープ", "デザイン強め"] },
+    { "id": "AME", "label": "アメカジ", "tags": ["デニム", "チェック", "ワーク", "王道"] },
+    { "id": "OUT", "label": "アウトドア", "tags": ["機能重視", "天候対応", "マウンパ/フリース", "耐久"] },
+    { "id": "KOR", "label": "韓国系", "tags": ["淡色", "短丈×ワイド", "セットアップ", "きれいめストリート"] },
+    { "id": "VIN", "label": "古着系（ヴィンテージ）", "tags": ["レトロ柄", "色褪せ", "年代MIX", "味"] }
   ],
   "tieBreakPriority": ["Q10", "Q7", "Q1"],
-  "typeDescriptions": {
-    "CLN": "シャツ/スラックス/ローファーなど、清潔感と整い重視。シンプル配色が得意。",
-    "CAS": "デニム/スウェット/パーカーなど、自然体で着回し重視。定番スニーカーが合う。",
-    "STR": "オーバーサイズ/ロゴ/カーゴなど、存在感と今っぽさ重視。ボリューム足元がハマる。",
-    "SPT": "ジャージ/ナイロン/テック素材など、快適さと機能性重視。走れる/歩けるが正義。",
-    "MOD": "黒多め/ミニマル/デザイン強め。細身or極端シルエットで雰囲気を作る。",
-    "AME": "デニム/チェック/ワーク感。王道アメリカンカジュアル寄り。",
-    "OUT": "マウンパ/フリース/機能重視。天候対応や耐久性もポイント。",
-    "KOR": "淡色/短丈×ワイド/セットアップなど。きれいめストリート寄りの今っぽさ。",
-    "VIN": "レトロ柄/色褪せ/リメイク/年代MIX。古着っぽい味が好き。"
+  "descriptions": {
+    "CLN": "きちんと感と清潔感で勝負。シンプル配色・シャツ・スラックス・ローファー/革靴寄りが得意。",
+    "CAS": "自然体で着回しやすい。デニム/スウェット/パーカーと定番スニーカーの組み合わせが強い。",
+    "STR": "オーバーサイズ・ロゴ・カーゴなどで主役を作る。ボリュームのある足元でバランスを取ると映える。",
+    "SPT": "動きやすさ・軽さ・テック素材。移動やアクティブな日でもストレスが少ないスタイル。",
+    "MOD": "黒・ミニマル・直線的。細身or極端シルエットなど“形”で雰囲気を出す。",
+    "AME": "デニム・ワーク・チェック。王道のアメリカンカジュアルでラフにかっこよく。",
+    "OUT": "マウンパ/フリース/GORE系など機能最優先。天候や移動に強い“実用おしゃれ”。",
+    "KOR": "淡色・短丈×ワイド・セットアップ。きれいめとストリートの間の“今っぽさ”。",
+    "VIN": "レトロ柄・色褪せ・年代MIX。新品っぽさより“味”と“抜け感”で作る。"
   },
   "questions": [
     {
       "id": "Q1",
       "text": "好きなシルエットは？",
       "choices": [
-        { "key": "A", "text": "ジャスト〜細め", "score": { "CLN": 3, "MOD": 2, "KOR": 1 } },
-        { "key": "B", "text": "ほどよくゆるめ", "score": { "CAS": 3, "AME": 2, "VIN": 1 } },
-        { "key": "C", "text": "オーバーサイズ", "score": { "STR": 3, "CAS": 1, "OUT": 1 } },
-        { "key": "D", "text": "短丈×ワイド（メリハリ）", "score": { "KOR": 3, "STR": 2, "MOD": 1 } }
+        { "text": "ジャスト〜細め", "score": { "CLN": 4, "MOD": 3, "KOR": 1 } },
+        { "text": "ほどよくゆるめ", "score": { "CAS": 4, "AME": 2, "VIN": 1 } },
+        { "text": "オーバーサイズ", "score": { "STR": 4, "CAS": 1, "OUT": 1 } },
+        { "text": "短丈×ワイド（メリハリ）", "score": { "KOR": 4, "STR": 2, "MOD": 1 } },
+        { "text": "極端シルエット（尖り）", "score": { "MOD": 4, "STR": 2, "KOR": 1 } }
       ]
     },
     {
       "id": "Q2",
-      "text": "よく使う色は？",
+      "text": "よく使う配色は？",
       "choices": [
-        { "key": "A", "text": "黒・グレー中心", "score": { "MOD": 3, "CLN": 2 } },
-        { "key": "B", "text": "白黒＋ベーシック（ネイビー/ベージュ）", "score": { "CLN": 3, "CAS": 2, "AME": 1 } },
-        { "key": "C", "text": "淡色（アイボリー/ライトグレー/パステル）", "score": { "KOR": 3, "CLN": 1 } },
-        { "key": "D", "text": "差し色/濃色/柄も好き", "score": { "STR": 3, "VIN": 2, "AME": 1 } }
+        { "text": "黒・グレー中心", "score": { "MOD": 4, "CLN": 2 } },
+        { "text": "白黒＋ベーシック（ネイビー/ベージュ）", "score": { "CLN": 4, "CAS": 2, "AME": 1 } },
+        { "text": "淡色（アイボリー/ライトグレー/パステル）", "score": { "KOR": 4, "CLN": 1 } },
+        { "text": "差し色強め・ロゴ/柄も好き", "score": { "STR": 4, "VIN": 2, "AME": 1 } },
+        { "text": "アース/カーキ/機能っぽい色", "score": { "OUT": 4, "SPT": 2, "AME": 1 } }
       ]
     },
     {
       "id": "Q3",
       "text": "よく着るトップスは？",
       "choices": [
-        { "key": "A", "text": "シャツ/きれいめニット", "score": { "CLN": 3, "MOD": 2 } },
-        { "key": "B", "text": "スウェット/パーカー", "score": { "CAS": 3, "AME": 2, "STR": 1 } },
-        { "key": "C", "text": "ロゴT/グラフィック", "score": { "STR": 3, "VIN": 2 } },
-        { "key": "D", "text": "ジャージ/機能T", "score": { "SPT": 3, "OUT": 2 } }
+        { "text": "シャツ（きれいめ）", "score": { "CLN": 4, "MOD": 2, "KOR": 1 } },
+        { "text": "きれいめニット/カーデ", "score": { "CLN": 3, "MOD": 3, "KOR": 1 } },
+        { "text": "スウェット", "score": { "CAS": 4, "AME": 2, "STR": 1 } },
+        { "text": "パーカー", "score": { "CAS": 3, "STR": 3, "AME": 1 } },
+        { "text": "ロゴT/グラフィック", "score": { "STR": 4, "VIN": 2 } },
+        { "text": "ジャージ/ドライ/機能T", "score": { "SPT": 4, "OUT": 2 } }
       ]
     },
     {
       "id": "Q4",
-      "text": "いちばん好きなアウターは？",
+      "text": "ボトムの定番は？",
       "choices": [
-        { "key": "A", "text": "テーラード/コート", "score": { "CLN": 3, "MOD": 2 } },
-        { "key": "B", "text": "デニムジャケット/ワーク系", "score": { "AME": 3, "VIN": 2 } },
-        { "key": "C", "text": "ダウン/ボリュームアウター", "score": { "STR": 3, "CAS": 1 } },
-        { "key": "D", "text": "マウンパ/フリース", "score": { "OUT": 3, "SPT": 2 } }
+        { "text": "スラックス", "score": { "CLN": 4, "MOD": 3, "KOR": 1 } },
+        { "text": "ストレートデニム", "score": { "AME": 3, "CAS": 3, "VIN": 2 } },
+        { "text": "ワイドデニム", "score": { "STR": 3, "KOR": 2, "VIN": 2, "CAS": 1 } },
+        { "text": "カーゴ/ワークパンツ", "score": { "STR": 4, "OUT": 2, "AME": 1 } },
+        { "text": "ナイロン/ジャージパンツ", "score": { "SPT": 4, "OUT": 2, "STR": 1 } },
+        { "text": "スカート/ワンピ合わせが多い", "score": { "KOR": 3, "CLN": 2, "VIN": 2 } }
       ]
     },
     {
       "id": "Q5",
-      "text": "ボトムの定番は？",
+      "text": "好きなアウターは？",
       "choices": [
-        { "key": "A", "text": "スラックス", "score": { "CLN": 3, "MOD": 2, "KOR": 1 } },
-        { "key": "B", "text": "デニム", "score": { "AME": 3, "CAS": 2, "VIN": 2 } },
-        { "key": "C", "text": "カーゴ/ワイド", "score": { "STR": 3, "OUT": 2 } },
-        { "key": "D", "text": "ナイロン/ジャージパンツ", "score": { "SPT": 3, "OUT": 1, "STR": 1 } }
+        { "text": "コート/テーラード", "score": { "CLN": 4, "MOD": 3 } },
+        { "text": "デニムジャケット", "score": { "AME": 4, "VIN": 2, "CAS": 1 } },
+        { "text": "ワークジャケット/カバーオール", "score": { "AME": 4, "VIN": 2, "STR": 1 } },
+        { "text": "ダウン/ボリューム", "score": { "STR": 4, "CAS": 2 } },
+        { "text": "マウンパ/シェル（機能）", "score": { "OUT": 4, "SPT": 2 } },
+        { "text": "フリース", "score": { "OUT": 3, "CAS": 2, "VIN": 1 } }
       ]
     },
     {
       "id": "Q6",
       "text": "靴の好みは？",
       "choices": [
-        { "key": "A", "text": "革靴/ローファー寄り", "score": { "CLN": 3, "MOD": 2 } },
-        { "key": "B", "text": "シンプルなスニーカー", "score": { "CAS": 3, "CLN": 1, "AME": 1 } },
-        { "key": "C", "text": "厚底/ボリューム系", "score": { "STR": 3, "KOR": 2 } },
-        { "key": "D", "text": "ランニング/トレイル系", "score": { "SPT": 3, "OUT": 2 } }
+        { "text": "革靴/ローファー寄り", "score": { "CLN": 4, "MOD": 3 } },
+        { "text": "細身でシンプルなスニーカー", "score": { "CLN": 3, "CAS": 3, "KOR": 1 } },
+        { "text": "レトロなスニーカー（雰囲気）", "score": { "CAS": 3, "AME": 2, "VIN": 2 } },
+        { "text": "厚底/ボリューム系", "score": { "STR": 4, "KOR": 3 } },
+        { "text": "ランニング系（軽い・歩ける）", "score": { "SPT": 4, "OUT": 2 } },
+        { "text": "トレイル/ハイク系", "score": { "OUT": 4, "SPT": 2 } }
       ]
     },
     {
       "id": "Q7",
-      "text": "服選びで一番大事なのは？",
+      "text": "服で一番外したくないのは？",
       "choices": [
-        { "key": "A", "text": "きちんと見え・清潔感", "score": { "CLN": 3, "MOD": 2 } },
-        { "key": "B", "text": "着回し・ラクさ", "score": { "CAS": 3, "AME": 2 } },
-        { "key": "C", "text": "盛れる・存在感", "score": { "STR": 3, "KOR": 2, "VIN": 1 } },
-        { "key": "D", "text": "機能（軽い/動ける/天候対応）", "score": { "OUT": 3, "SPT": 2 } }
+        { "text": "清潔感・きちんと見え", "score": { "CLN": 4, "MOD": 2, "KOR": 1 } },
+        { "text": "着回し・ラクさ", "score": { "CAS": 4, "AME": 2 } },
+        { "text": "快適さ・動きやすさ", "score": { "SPT": 4, "OUT": 2 } },
+        { "text": "トレンド・盛れ感", "score": { "STR": 4, "KOR": 2 } },
+        { "text": "古着っぽい“味”", "score": { "VIN": 4, "AME": 2, "CAS": 1 } }
       ]
     },
     {
       "id": "Q8",
-      "text": "好きな素材感は？",
+      "text": "柄・デザインの好みは？",
       "choices": [
-        { "key": "A", "text": "上質・ツルっと/落ち感", "score": { "MOD": 3, "CLN": 2 } },
-        { "key": "B", "text": "コットン・裏毛・デニム", "score": { "AME": 3, "CAS": 2 } },
-        { "key": "C", "text": "テック素材（ナイロン/リップストップ）", "score": { "SPT": 3, "OUT": 2, "STR": 1 } },
-        { "key": "D", "text": "古着っぽい風合い（色褪せ/加工）", "score": { "VIN": 3, "AME": 2, "STR": 1 } }
+        { "text": "無地・ミニマル", "score": { "CLN": 4, "MOD": 3 } },
+        { "text": "ロゴ/グラフィック強め", "score": { "STR": 4, "VIN": 2 } },
+        { "text": "チェック/ワークっぽい", "score": { "AME": 4, "VIN": 2 } },
+        { "text": "レトロ柄/年代っぽさ", "score": { "VIN": 4, "AME": 2, "CAS": 1 } },
+        { "text": "テック感（ポケット/切替/ギア）", "score": { "OUT": 4, "SPT": 2, "STR": 1 } }
       ]
     },
     {
       "id": "Q9",
-      "text": "柄・デザインの好みは？",
+      "text": "バッグ/小物の方向性は？",
       "choices": [
-        { "key": "A", "text": "無地・ミニマル", "score": { "CLN": 3, "MOD": 2 } },
-        { "key": "B", "text": "チェック/ワークっぽい", "score": { "AME": 3, "VIN": 2 } },
-        { "key": "C", "text": "ロゴ/グラフィック強め", "score": { "STR": 3, "KOR": 1 } },
-        { "key": "D", "text": "レトロ柄/年代MIX", "score": { "VIN": 3, "AME": 1, "CAS": 1 } }
+        { "text": "レザー/小さめで上品", "score": { "CLN": 4, "MOD": 2 } },
+        { "text": "シンプルで実用（トート/ショルダー）", "score": { "CAS": 4, "KOR": 1 } },
+        { "text": "スポーツ/ジム系", "score": { "SPT": 4, "OUT": 2 } },
+        { "text": "ミニショルダー/韓国っぽい", "score": { "KOR": 4, "STR": 1, "CLN": 1 } },
+        { "text": "バックパック/アウトドア", "score": { "OUT": 4, "SPT": 2 } },
+        { "text": "古着っぽい一点もの", "score": { "VIN": 4, "AME": 2 } }
       ]
     },
     {
       "id": "Q10",
-      "text": "コーデの主役は？",
+      "text": "コーデの主役は？（最重要）",
       "choices": [
-        { "key": "A", "text": "全体の整い（品）", "score": { "CLN": 3, "MOD": 2 } },
-        { "key": "B", "text": "ラフな雰囲気", "score": { "CAS": 3, "AME": 1 } },
-        { "key": "C", "text": "シルエット/ロゴのインパクト", "score": { "STR": 3, "KOR": 2 } },
-        { "key": "D", "text": "走れる・動ける実用", "score": { "SPT": 3, "OUT": 2 } }
+        { "text": "“整い”と品（きちんと感）", "score": { "CLN": 5, "MOD": 3 } },
+        { "text": "“雰囲気”とラフさ", "score": { "CAS": 5, "AME": 2, "VIN": 1 } },
+        { "text": "“インパクト”とシルエット/ロゴ", "score": { "STR": 5, "KOR": 3 } },
+        { "text": "“機能”と快適さ（動ける）", "score": { "SPT": 5, "OUT": 3 } },
+        { "text": "“黒/ミニマル”の世界観", "score": { "MOD": 5, "CLN": 2 } }
       ]
     },
     {
       "id": "Q11",
-      "text": "“よくいる場所”に近いのは？",
+      "text": "最近惹かれるテイストは？",
       "choices": [
-        { "key": "A", "text": "きれいめな街/お店", "score": { "CLN": 3, "MOD": 1 } },
-        { "key": "B", "text": "カフェ・買い物・友達とゆるく", "score": { "CAS": 3, "KOR": 1, "AME": 1 } },
-        { "key": "C", "text": "イベント/ライブ/写真撮る", "score": { "STR": 3, "KOR": 2 } },
-        { "key": "D", "text": "外・移動多め（天気関係なく）", "score": { "OUT": 3, "SPT": 2 } }
-      ]
-    },
-    {
-      "id": "Q12",
-      "text": "憧れるスタイルは？",
-      "choices": [
-        { "key": "A", "text": "端正・ミニマル", "score": { "MOD": 3, "CLN": 2 } },
-        { "key": "B", "text": "王道カジュアル", "score": { "CAS": 3, "AME": 2 } },
-        { "key": "C", "text": "スケボー/ストリート感", "score": { "STR": 3, "VIN": 1 } },
-        { "key": "D", "text": "アスレジャー/テック感", "score": { "SPT": 3, "OUT": 2 } }
+        { "text": "セットアップ/きれいめストリート", "score": { "KOR": 4, "CLN": 2, "STR": 1 } },
+        { "text": "スケーター/ストリート", "score": { "STR": 4, "VIN": 1 } },
+        { "text": "ゴープコア/アウトドアMIX", "score": { "OUT": 4, "SPT": 2, "STR": 1 } },
+        { "text": "王道アメカジ/ワーク", "score": { "AME": 4, "VIN": 2, "CAS": 1 } },
+        { "text": "ミニマル・モード", "score": { "MOD": 4, "CLN": 2 } },
+        { "text": "王道カジュアル", "score": { "CAS": 4, "CLN": 1 } }
       ]
     }
   ]
@@ -258,6 +265,10 @@
   <script>
     // =========================
     //  アプリ本体（HTML内JS）
+    //  変更点：
+    //   - 9タイプ固定
+    //   - 1位＝メイン、2位＝サブを必ず表示
+    //   - 質問ごとに選択肢数は自由
     // =========================
     const el = {
       title: document.getElementById("title"),
@@ -273,48 +284,25 @@
       nextBtn: document.getElementById("nextBtn"),
       result: document.getElementById("result"),
       resultMain: document.getElementById("resultMain"),
-      resultMix: document.getElementById("resultMix"),
+      resultSub: document.getElementById("resultSub"),
       resultExplain: document.getElementById("resultExplain"),
+      mainTags: document.getElementById("mainTags"),
+      subTags: document.getElementById("subTags"),
       resultScores: document.getElementById("resultScores"),
       restartBtn: document.getElementById("restartBtn")
     };
 
-    const state = { idx: 0, answers: [], config: null, mode: 9 };
+    const state = { idx: 0, answers: [], config: null };
 
     function parseConfig() {
       const raw = document.getElementById("quizConfig").textContent.trim();
-      const cfg = JSON.parse(raw);
-      return cfg;
-    }
-
-    function getUrlMode() {
-      const p = new URLSearchParams(location.search);
-      const mode = p.get("mode");
-      return mode === "8" ? 8 : null;
-    }
-
-    function applyMode(cfg, mode) {
-      // mode: 9 or 8
-      cfg = structuredClone(cfg);
-      cfg.useEightTypes = (mode === 8);
-      return cfg;
+      return JSON.parse(raw);
     }
 
     function init() {
-      const cfg = parseConfig();
-      const urlMode = getUrlMode();
-      if (urlMode === 8) {
-        // UIも8に合わせる
-        document.querySelector('input[name="mode"][value="8"]').checked = true;
-        state.mode = 8;
-      } else {
-        state.mode = 9;
-      }
-
-      state.config = applyMode(cfg, state.mode);
+      state.config = parseConfig();
       el.title.textContent = state.config.title || "Style Diagnosis";
-      el.subtitle.textContent = `約${Math.round((state.config.timeEstimateSec || 120) / 60)}分で終わります`;
-
+      el.subtitle.textContent = "メインタイプ＋サブタイプを表示します";
       state.answers = new Array(state.config.questions.length).fill(null);
 
       bindEvents();
@@ -323,19 +311,6 @@
     }
 
     function bindEvents() {
-      // モード変更
-      document.querySelectorAll('input[name="mode"]').forEach(r => {
-        r.addEventListener("change", () => {
-          state.mode = Number(document.querySelector('input[name="mode"]:checked').value);
-          const base = parseConfig();
-          state.config = applyMode(base, state.mode);
-          state.answers = new Array(state.config.questions.length).fill(null);
-          state.idx = 0;
-          el.step.textContent = "";
-          el.progress.style.width = "0%";
-        });
-      });
-
       el.startBtn.addEventListener("click", () => {
         state.idx = 0;
         el.start.style.display = "none";
@@ -345,21 +320,14 @@
       });
 
       el.backBtn.addEventListener("click", () => {
-        if (state.idx > 0) {
-          state.idx--;
-          render();
-        }
+        if (state.idx > 0) { state.idx--; render(); }
       });
 
       el.nextBtn.addEventListener("click", () => {
         const total = state.config.questions.length;
-        if (state.idx < total - 1) {
-          state.idx++;
-          render();
-          return;
-        }
-        const result = calculateResult();
-        showResult(result);
+        if (state.idx < total - 1) { state.idx++; render(); return; }
+        const r = calculateResult();
+        showResult(r);
       });
 
       el.restartBtn.addEventListener("click", () => {
@@ -386,8 +354,10 @@
 
       const selected = state.answers[state.idx];
 
-      q.choices.forEach(choice => {
-        const id = `${q.id}_${choice.key}`;
+      q.choices.forEach((choice, i) => {
+        const key = choice.key ?? String(i + 1); // key未指定でもOK
+        const id = `${q.id}_${key}`;
+
         const label = document.createElement("label");
         label.className = "choice";
         label.htmlFor = id;
@@ -396,91 +366,76 @@
         input.type = "radio";
         input.name = "choice";
         input.id = id;
-        input.value = choice.key;
-        input.checked = selected === choice.key;
+        input.value = String(i);
+        input.checked = selected === i;
 
         input.addEventListener("change", () => {
-          state.answers[state.idx] = choice.key;
+          state.answers[state.idx] = i;
           el.nextBtn.disabled = false;
         });
 
         label.appendChild(input);
-        label.appendChild(document.createTextNode(`${choice.key}. ${choice.text}`));
+        label.appendChild(document.createTextNode(`${choice.text}`));
         el.choices.appendChild(label);
       });
 
       el.backBtn.disabled = (state.idx === 0);
       el.nextBtn.textContent = (state.idx === total - 1) ? "結果を見る" : "次へ";
-      el.nextBtn.disabled = !state.answers[state.idx];
+      el.nextBtn.disabled = (state.answers[state.idx] === null);
     }
 
     function calculateResult() {
       const cfg = state.config;
-
-      // スコア初期化
       const typeIds = cfg.types.map(t => t.id);
       const scores = Object.fromEntries(typeIds.map(id => [id, 0]));
 
-      // 回答加点
-      cfg.questions.forEach((q, i) => {
-        const ans = state.answers[i];
-        if (!ans) return;
-        const choice = q.choices.find(c => c.key === ans);
-        if (!choice) return;
+      // 加点
+      cfg.questions.forEach((q, qi) => {
+        const ansIndex = state.answers[qi];
+        if (ansIndex === null || ansIndex === undefined) return;
 
-        const sc = choice.score || {};
-        Object.entries(sc).forEach(([typeId, pts]) => {
-          if (scores[typeId] != null) scores[typeId] += pts;
-        });
+        const choice = q.choices[ansIndex];
+        const sc = choice?.score || {};
+        for (const [tid, pts] of Object.entries(sc)) {
+          if (scores[tid] != null) scores[tid] += pts;
+        }
       });
 
-      // 8タイプ統合（AME + VIN → AME_VIN）
-      let finalTypes = cfg.types;
-      let finalScores = { ...scores };
-
-      if (cfg.useEightTypes) {
-        const mergedId = "AME_VIN";
-        finalScores[mergedId] = (finalScores["AME"] || 0) + (finalScores["VIN"] || 0);
-        delete finalScores["AME"];
-        delete finalScores["VIN"];
-
-        finalTypes = cfg.types
-          .filter(t => t.id !== "AME" && t.id !== "VIN")
-          .concat([{ id: mergedId, label: "アメカジ・古着" }]);
-      }
-
-      const sorted = Object.entries(finalScores)
+      // ソート（同点対策を入れる）
+      let sorted = Object.entries(scores)
         .map(([id, score]) => ({ id, score }))
         .sort((a, b) => b.score - a.score);
 
+      // 1位同点ならタイブレーク
       const topScore = sorted[0].score;
       const tiedTop = sorted.filter(x => x.score === topScore).map(x => x.id);
+      let mainId = tiedTop.length > 1 ? breakTie(tiedTop) : sorted[0].id;
 
-      const mainId = tiedTop.length > 1 ? breakTie(tiedTop, finalScores) : sorted[0].id;
+      // 2位（サブ）決定：mainを除いた中で最高点。ここも同点ならタイブレーク。
+      const remaining = sorted.filter(x => x.id !== mainId);
+      const secondScore = remaining[0].score;
+      const tiedSecond = remaining.filter(x => x.score === secondScore).map(x => x.id);
+      let subId = tiedSecond.length > 1 ? breakTie(tiedSecond) : remaining[0].id;
 
-      const mainObj = sorted.find(x => x.id === mainId);
-      const secondObj = sorted.find(x => x.id !== mainId);
-      const mix =
-        secondObj && (mainObj.score - secondObj.score) <= (cfg.mixThreshold ?? 2)
-          ? secondObj.id
-          : null;
+      // ラベル
+      const mainLabel = (cfg.types.find(t => t.id === mainId) || { label: mainId }).label;
+      const subLabel  = (cfg.types.find(t => t.id === subId)  || { label: subId }).label;
 
-      const mainLabel = (finalTypes.find(t => t.id === mainId) || { label: mainId }).label;
-      const mixLabel = mix ? (finalTypes.find(t => t.id === mix) || { label: mix }).label : null;
-
-      return { mainId, mainLabel, mixId: mix, mixLabel, sorted, finalTypes };
+      return { scores, sorted, mainId, mainLabel, subId, subLabel };
     }
 
     function breakTie(tiedTypeIds) {
+      // tieBreakPriority の質問で、選択肢が「そのタイプにどれだけ点を入れているか」で差をつける
       const cfg = state.config;
-      for (const qid of cfg.tieBreakPriority || []) {
+
+      for (const qid of (cfg.tieBreakPriority || [])) {
         const qIndex = cfg.questions.findIndex(q => q.id === qid);
         if (qIndex === -1) continue;
-        const ans = state.answers[qIndex];
-        if (!ans) continue;
 
-        const q = cfg.questions[qIndex];
-        const choice = q.choices.find(c => c.key === ans);
+        const ansIndex = state.answers[qIndex];
+        if (ansIndex === null || ansIndex === undefined) continue;
+
+        const choice = cfg.questions[qIndex].choices[ansIndex];
         const sc = choice?.score || {};
 
         let best = tiedTypeIds[0];
@@ -491,39 +446,37 @@
           if (pts > bestPts) { best = tid; bestPts = pts; }
         }
 
-        const topPtsCount = tiedTypeIds.filter(tid => (sc[tid] ?? 0) === bestPts).length;
-        if (topPtsCount === 1) return best;
+        // その質問で一意に決まるなら確定
+        const numTop = tiedTypeIds.filter(tid => (sc[tid] ?? 0) === bestPts).length;
+        if (numTop === 1) return best;
       }
 
-      // 固定順
-      const order = cfg.useEightTypes
-        ? cfg.types.filter(t => t.id !== "AME" && t.id !== "VIN").map(t => t.id).concat(["AME_VIN"])
-        : cfg.types.map(t => t.id);
-
+      // それでも決まらない場合：タイプの定義順で先のもの
+      const order = cfg.types.map(t => t.id);
       for (const id of order) if (tiedTypeIds.includes(id)) return id;
       return tiedTypeIds[0];
     }
 
-    function showResult(result) {
+    function showResult(r) {
       const cfg = state.config;
 
       el.quiz.style.display = "none";
       el.result.style.display = "block";
 
-      el.resultMain.innerHTML = `<span class="pill">メイン</span> ${result.mainLabel}`;
-      el.resultMix.textContent = result.mixLabel ? `ミックス傾向：${result.mixLabel} も強め` : "";
+      el.resultMain.innerHTML = `<span class="pill">メイン</span> ${r.mainLabel}`;
+      el.resultSub.innerHTML  = `<span class="pill">サブ</span> ${r.subLabel}`;
 
-      // 説明文
-      const desc = cfg.typeDescriptions || {};
-      const mainDesc = desc[result.mainId] || "";
-      const mixDesc = result.mixId ? (desc[result.mixId] || "") : "";
+      const desc = cfg.descriptions || {};
       el.resultExplain.textContent =
-        result.mixId
-          ? `特徴：${mainDesc} /（ミックス）${mixDesc}`
-          : `特徴：${mainDesc}`;
+        `特徴：${desc[r.mainId] || ""}　/　（サブの傾向）${desc[r.subId] || ""}`;
 
-      // スコア表示
-      el.resultScores.textContent = result.sorted.map(x => `${x.id}:${x.score}`).join("  /  ");
+      const mainType = cfg.types.find(t => t.id === r.mainId);
+      const subType  = cfg.types.find(t => t.id === r.subId);
+      el.mainTags.textContent = (mainType?.tags || []).slice(0, 4).join("・");
+      el.subTags.textContent  = (subType?.tags  || []).slice(0, 4).join("・");
+
+      const sortedPairs = r.sorted.map(x => `${x.id}:${x.score}`).join("  /  ");
+      el.resultScores.textContent = sortedPairs;
     }
 
     init();
